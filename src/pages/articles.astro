@@ -1,0 +1,78 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../config';
+
+const articles = (await Astro.glob('./article/*.{md,mdx}')).sort(
+  (a, b) =>
+    new Date(b.frontmatter.pubDate).valueOf() -
+    new Date(a.frontmatter.pubDate).valueOf()
+);
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <style>
+      ul {
+        list-style-type: none;
+        padding: unset;
+      }
+      ul li {
+        display: flex;
+      }
+      ul li time {
+        flex: 0 0 130px;
+        font-style: italic;
+        color: #888;
+      }
+      ul li a:visited {
+        color: #8e32dc;
+      }
+    </style>
+  </head>
+  <body data-theme="light">
+    <Header />
+    <main>
+      <section class="page__content" id="articles">
+        <ul>
+          {
+            articles.map((article) => (
+              <li>
+                <img
+                  src={article.frontmatter.heroImage}
+                  alt={article.frontmatter.title}
+                />
+                <div class="card__content">
+                  <a href={article.url}>{article.frontmatter.title}</a>
+                  <br />
+                  <time datetime={article.frontmatter.pubDate}>
+                    <small>Published on: </small>
+                    {new Date(article.frontmatter.pubDate).toLocaleDateString(
+                      'en-us',
+                      {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      }
+                    )}
+                  </time>
+                </div>
+                <div class="tags__container tags__in__card">
+                  <ul>
+                    <b>Tags: </b>
+                    {article.frontmatter.tags &&
+                      article.frontmatter.tags.map((tag) => <li>{tag}</li>)}
+                  </ul>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </main>
+    <Footer />
+  </body>
+</html>
